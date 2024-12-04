@@ -1,14 +1,17 @@
 const express = require('express');
+const serverless = require('serverless-http');
+
+// Create your Express app
 const app = express();
 
-// Adding a simple route
+// Define routes
 app.get('/', (req, res) => {
-    console.log('Home route accessed');
-    res.send('Hello, World!');
+  res.send('Hello, AWS Lambda!');
 });
 
-// Starting the server
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+app.get('/test', (req, res) => {
+  res.send({ message: 'Testing Lambda deployment' });
 });
+
+// Export the app as a handler using serverless-http
+module.exports.handler = serverless(app);
