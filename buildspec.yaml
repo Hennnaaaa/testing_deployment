@@ -7,7 +7,7 @@ phases:
       - npm install
   build:
     commands:
-      - zip -r deployment-package.zip index.js package.json node_modules
+      - zip -r deployment-package.zip test test/package.json test/node_modules
 artifacts:
   files:
     - deployment-package.zip
