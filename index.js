@@ -15,3 +15,8 @@ app.get('/test', (req, res) => {
 
 // Export the app as a handler using serverless-http
 module.exports.handler = serverless(app);
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(5000, () => {
+      console.log('Server is running on port 5000');
+    });
+  }
