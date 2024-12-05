@@ -1,13 +1,17 @@
 version: 0.2
+
 phases:
   install:
     runtime-versions:
-      nodejs: 14
+      nodejs: 18
     commands:
       - npm install
   build:
     commands:
-      - zip -r deployment-package.zip test test/package.json test/node_modules
+      # Create zip with all necessary files
+      - zip -r deployment-package.zip . -x "*.git*"
+
 artifacts:
   files:
     - deployment-package.zip
+  discard-paths: no

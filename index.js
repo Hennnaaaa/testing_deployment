@@ -1,22 +1,55 @@
 const express = require('express');
 const serverless = require('serverless-http');
 
-// Create your Express app
+// Create Express app
 const app = express();
 
-// Define routes
+// Add necessary middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Add CORS headers
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'healthy' });
+});
+
+// Your routes
 app.get('/', (req, res) => {
-  res.send('Hello, AWS Lambda!');
+  res.json({ message: 'Hello, AWS Lambda!' });
 });
 
 app.get('/test', (req, res) => {
-  res.send({ message: 'Testing Lambda deployment' });
+  res.json({ message: 'Testing Lambda deployment' });
 });
 
-// Export the app as a handler using serverless-http
-module.exports.handler = serverless(app);
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something went wrong!' });
+});
+
+// Export handler for Lambda
+const handler = serverless(app);
+exports.handler = async (event, context) => {
+  // Return response from serverless-http
+  return await handler(event, context);
+};
+
+// Local development server
 if (process.env.NODE_ENV !== 'production') {
-    app.listen(5000, () => {
-      console.log('Server is running on port 5000');
-    });
-  }
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
